@@ -11,11 +11,54 @@
 # tkinter library for graphics
 from tkinter import *
 from tkinter import messagebox
+import traceback
+# Libraries for using the database and file system
+import sqlite3
+import pathlib
 
 # Global Variable
-
+conn = None
 
 # Function
+def fnOpenDatabase():
+    global conn
+    # This function will open the database and print out all of the
+    # record to verify it is working
+    # dbFile = 'database/HW_Database.sqlite3'
+    dbFile = pathlib.Path('P3DB - Template.db')
+    if dbFile.exists() == True:         
+        conn = sqlite3.connect(dbFile)
+        cur = conn.cursor()
+        # Execute a test query
+        cur.execute("SELECT * FROM finances;")
+        records = cur.fetchall()
+        print("*** DEBUGGING ***\n", records)
+    else:
+        messagebox.showerror("Error", "Database not found.")
+        quit()
+
+def getDough():
+    print("Get Dough")
+    try:
+        global conn
+        cur = conn.cursor()
+        
+        # Create a veriable for our query
+        sql = "SELECT name FROM HW_Database;"
+         # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        records = cur.fetchall()
+        print("*** DEBUGGING ***\n records for display", records)
+    
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
 
 # GUI
 root = Tk()
@@ -121,6 +164,9 @@ lstPastItems.grid(row=0, column=0)
 scrPastItems.config(command=lstPastItems.yview)
 
 Button(root, text="Show Order Details").grid(row=28, column=0, columnspan=3, sticky=W)
+
+# Connect and open the database
+fnOpenDatabase()
 
 # Open the windows
 root.mainloop()
