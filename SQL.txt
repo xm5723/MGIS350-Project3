@@ -1,0 +1,10 @@
+SELECT dough FROM inventory;
+SELECT sauce FROM inventory;
+SELECT cheese FROM inventory;
+SELECT pepperoni FROM inventory;
+
+INSERT INTO inventory (dough) VALUES (100);
+
+UPDATE inventory
+SET dough = 100
+WHERE id = 1;
