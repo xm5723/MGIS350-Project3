@@ -18,6 +18,12 @@ import pathlib
 
 # Global Variable
 conn = None
+invDough = list()
+invSauce = 0.0
+invCheese = 0.0
+invPepperoni = 0.0
+fdSales = 0.0
+fdExpenses = 0.0
 
 # Function
 def fnOpenDatabase():
@@ -40,17 +46,22 @@ def fnOpenDatabase():
 def getDough():
     print("Get Dough")
     try:
-        global conn
+        global conn, invDough
         cur = conn.cursor()
-        
+
         # Create a veriable for our query
-        sql = "SELECT name FROM HW_Database;"
+        sql = "SELECT dough FROM inventory;"
          # Output the query for debugging
         print("**** debugging ***\nQuery:", sql)
         cur.execute(sql)
         records = cur.fetchall()
         print("*** DEBUGGING ***\n records for display", records)
-    
+        lblDough.config(text=records)
+
+        for record in records:
+            # lstTransactions.insert(END, record[0])
+            invDough.append(record[0])
+
     except sqlite3.OperationalError as soe:
         messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
         traceback.print_exc()
@@ -59,6 +70,32 @@ def getDough():
     except Exception as ex:
         messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
         traceback.print_exc()
+
+def updateDough():
+    print("Update Dough")
+    try:
+        global conn, invDough
+        cur = conn.cursor()
+        
+        # Create a veriable for our query
+        sql = "UPDATE inventory SET dough = '"+ str(invDough[0] + 100)+ "' WHERE id = 1;"
+         # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)      
+        getDough()
+    
+
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+def getInventory():
+    getDough()
 
 # GUI
 root = Tk()
@@ -94,7 +131,7 @@ Checkbutton(root, text="Add Sauce", variable=addSauce).grid(row=2, column=11, st
 Checkbutton(root, text="Add Cheese", variable=addCheese).grid(row=3, column=11, sticky=W)
 Checkbutton(root, text="Add Pepperoni", variable=addPepperoni).grid(row=4, column=11,sticky=W)
 # Button(root, text="Add To Inventory", command=fnAddToInventory).grid(row=5, column=11,sticky=W)
-Button(root, text="Add To Inventory").grid(row=5, column=11,sticky=W)
+Button(root, text="Add To Inventory", command=updateDough).grid(row=5, column=11,sticky=W)
 
 Label(root, text=" ").grid(row=1, column=19, sticky=W) # Spacer between add to inventory & order form
 Label(root, text="ORDER FORM").grid(row=0, column=20, columnspan=3, sticky=W)
@@ -167,6 +204,8 @@ Button(root, text="Show Order Details").grid(row=28, column=0, columnspan=3, sti
 
 # Connect and open the database
 fnOpenDatabase()
+
+getInventory()
 
 # Open the windows
 root.mainloop()
