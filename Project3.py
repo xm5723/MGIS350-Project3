@@ -297,8 +297,36 @@ def UpdateInventory():
         updatePepperoni()
     #     fdExpenses += 40
 
+#Function to place Order
 def fnPlaceOrder():
-    
+    global needDough, needSauce, needCheese, needPepperoni, needSales, invDough, invSauce, invCheese, invPepperoni, fdSales
+    if needDough > invDough or needSauce > invSauce or needCheese > invCheese or needPepperoni > invPepperoni:
+        messagebox.showerror("Inventory Error", "There is not enough inventory to place this order. Either cancel the order or add more inventory.")
+    else:
+        invDough -= needDough
+        needDough = 0.0
+        invSauce -= needSauce
+        needSauce = 0.0
+        invCheese -= needCheese
+        needCheese = 0.0
+        invPepperoni -= needPepperoni
+        needPepperoni = 0.0
+        fdSales += needSales
+        needSales = 0.0
+
+        lstItems.delete(0, END)
+        fnUpdateInventoryOutput()
+        fnUpdateFinancialData()
+
+# Function to cancel order
+def fnCancelOrder():
+    global needDough, needSauce, needCheese, needPepperoni, needSales
+    needDough = 0.0
+    needSauce = 0.0
+    needCheese = 0.0
+    needPepperoni = 0.0
+    needSales = 0.0
+    lstItems.delete(0, END)
     
 # GUI
 root = Tk()
@@ -362,9 +390,9 @@ scrItems.config(command=lstItems.yview)
 # Button(root, text="Remove Selected", command=fnRemoveItem).grid(row=19, column=22,sticky=W)
 # Button(root, text="Cancel Order", command=fnCancelOrder).grid(row=19, column=23, sticky=W)
 
-Button(root, text="Place Order").grid(row=19, column=21, sticky=W)
+Button(root, text="Place Order", command=fnPlaceOrder).grid(row=19, column=21, sticky=W)
 Button(root, text="Remove Selected").grid(row=19, column=22,sticky=W)
-Button(root, text="Cancel Order").grid(row=19, column=23, sticky=W)
+Button(root, text="Cancel Order", command=fnCancelOrder).grid(row=19, column=23, sticky=W)
 
 Label(root, text=" ").grid(row=0, column=29, sticky=W) # Spacer between add to order form & financial data
 Label(root, text="FINANCIAL DATA").grid(row=0, column=30, columnspan=3, sticky=W)
