@@ -297,6 +297,9 @@ def UpdateInventory():
         updatePepperoni()
     #     fdExpenses += 40
 
+def fnPlaceOrder():
+    
+    
 # GUI
 root = Tk()
 root.title("Project 3")
