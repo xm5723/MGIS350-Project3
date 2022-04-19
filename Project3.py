@@ -26,6 +26,12 @@ invPepperoni = 0.0
 fdSales = 0.0
 fdExpenses = 0.0
 
+needDough = 0.0
+needSauce = 0.0
+needCheese = 0.0
+needPepperoni = 0.0
+needSales = 0.0
+
 # Function
 def fnOpenDatabase():
     global conn
@@ -61,6 +67,33 @@ def getDough():
         for record in records:
             invDough = record[0]
             print('invDough ', invDough)
+
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+def getSauce():
+    print("Get Sauce")
+    try:
+        global conn, invSauce
+        cur = conn.cursor()
+        # Create a veriable for our query
+        sql = "SELECT sauce FROM inventory;"
+         # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        records = cur.fetchall()
+        print("*** DEBUGGING ***\n records for display", records)
+        lblSauce.config(text=records)
+
+        for record in records:
+            invSauce = record[0]
+            print('invSauce ', invSauce)
 
     except sqlite3.OperationalError as soe:
         messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
@@ -150,6 +183,29 @@ def updateDough():
         messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
         traceback.print_exc()
 
+def updateSauce():
+    print("-----------------------Update Sauce")
+    try:
+        global conn, invSauce
+        cur = conn.cursor()
+        # Create a veriable for our query
+        sql = "UPDATE inventory SET sauce = '"+ str(invSauce + 100)+ "' WHERE id = 1;"
+        # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        conn.commit()
+        print("End")
+        getSauce()
+    
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
 def updateCheese():
     print("-----------------------Update Cheese")
     try:
@@ -196,31 +252,54 @@ def updatePepperoni():
         messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
         traceback.print_exc()
 
+# Function to add an item to the order
+def fnAddToOrder():
+    global needDough, needSauce, needCheese, needPepperoni, needSales 
+    try:
+        qty = float(entQuantity.get())
+        needDough += qty * 6
+        needSauce += qty * 7 
+        needCheese += qty * 16 
+        if pizzaType.get() == 1:
+            needPepperoni += qty * 4
+            lstItems.insert(END, str(qty) + " Pepperoni Pizza(s)")
+        else:
+            lstItems.insert(END, str(qty) + " Cheese Pizza(s)")
+        needSales += qty * 15
+    except:
+        messagebox.showerror("Input Error", "The quantity must be a number.")
+
 def getInventory():
     getDough()
     getCheese()
     getPepperoni()
+    getSauce()
 
 # Function for adding dough to inventory
 def UpdateInventory():
     global invDough, invSauce, invCheese, invPepperoni, fdExpenses
     if addDough.get() == 1:
+        # invDough += 100
         updateDough()
 
         # fdExpenses += 20
-    # if addSauce.get() == 1:
+    if addSauce.get() == 1:
         # invSauce += 100
+        updateSauce()
+        
         # fdExpenses += 10
     if addCheese.get() == 1:
-          updateCheese()
+    #   invCheese += 100
+        updateCheese()
     #     fdExpenses += 25
     if addPepperoni.get() == 1:
+    #     invPepperoni += 100
         updatePepperoni()
     #     fdExpenses += 40
 
 # GUI
 root = Tk()
-root.title("Project 2")
+root.title("Project 3")
 root.geometry("960x600")
 
 # Label
@@ -264,7 +343,7 @@ pizzaType = IntVar()
 Radiobutton(root, text="Cheeze Pizza", variable=pizzaType, value=0).grid(row=2, column=21, columnspan=2, sticky=W)
 Radiobutton(root, text="Cheese & Pepperoni", variable=pizzaType, value=1).grid(row=3,column=21, columnspan=2, sticky=W)
 # Button(root, text="Add To Order", command=fnAddToOrder).grid(row=4, column=21,columnspan=2, sticky=W)
-Button(root, text="Add To Order").grid(row=4, column=21,columnspan=2, sticky=W)
+Button(root, text="Add To Order", command=fnAddToOrder).grid(row=4, column=21,columnspan=2, sticky=W)
 
 Label(root, text=" ").grid(row=9, column=0) # Row spacer
 Label(root, text="REVIEW ORDER").grid(row=10, column=20, columnspan=3, sticky=W)
