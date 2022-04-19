@@ -71,6 +71,34 @@ def getDough():
         messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
         traceback.print_exc()
 
+def getSauce():
+    print("Get Dough")
+    try:
+        global conn, invSauce
+        cur = conn.cursor()
+        # Create a veriable for our query
+        sql = "SELECT sauce FROM inventory;"
+         # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        records = cur.fetchall()
+        print("*** DEBUGGING ***\n records for display", records)
+        lblSauce.config(text=records)
+
+        for record in records:
+            invSauce = record[0]
+            print('invSauce ', invSauce)
+
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+
 def getCheese():
     print("Get Cheese")
     try:
@@ -150,6 +178,30 @@ def updateDough():
         messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
         traceback.print_exc()
 
+def updateSauce():
+    print("-----------------------Update Sauce")
+    try:
+        global conn, invSauce
+        cur = conn.cursor()
+        # Create a veriable for our query
+        sql = "UPDATE inventory SET sauce = '"+ str(invSauce + 100)+ "' WHERE id = 1;"
+        # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        conn.commit()
+        print("End")
+        getSauce()
+    
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+
 def updateCheese():
     print("-----------------------Update Cheese")
     try:
@@ -198,6 +250,7 @@ def updatePepperoni():
 
 def getInventory():
     getDough()
+    getSauce()
     getCheese()
     getPepperoni()
 
@@ -207,12 +260,14 @@ def UpdateInventory():
     if addDough.get() == 1:
         updateDough()
 
+    if addSauce.get() == 1:
+        updateSauce()
         # fdExpenses += 20
     # if addSauce.get() == 1:
         # invSauce += 100
         # fdExpenses += 10
     if addCheese.get() == 1:
-          updateCheese()
+        updateCheese()
     #     fdExpenses += 25
     if addPepperoni.get() == 1:
         updatePepperoni()
@@ -220,7 +275,7 @@ def UpdateInventory():
 
 # GUI
 root = Tk()
-root.title("Project 2")
+root.title("Project 3")
 root.geometry("960x600")
 
 # Label
