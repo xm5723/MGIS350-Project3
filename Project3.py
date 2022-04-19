@@ -78,7 +78,11 @@ def getDough():
         traceback.print_exc()
 
 def getSauce():
+<<<<<<< HEAD
     print("Get Sauce")
+=======
+    print("Get Dough")
+>>>>>>> 19dae27b7f56fcd907bd454ac5fc7894747bdb96
     try:
         global conn, invSauce
         cur = conn.cursor()
@@ -104,6 +108,10 @@ def getSauce():
         messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
         traceback.print_exc()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 19dae27b7f56fcd907bd454ac5fc7894747bdb96
 def getCheese():
     print("Get Cheese")
     try:
@@ -206,6 +214,10 @@ def updateSauce():
         messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
         traceback.print_exc()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 19dae27b7f56fcd907bd454ac5fc7894747bdb96
 def updateCheese():
     print("-----------------------Update Cheese")
     try:
@@ -271,6 +283,7 @@ def fnAddToOrder():
 
 def getInventory():
     getDough()
+    getSauce()
     getCheese()
     getPepperoni()
     getSauce()
@@ -282,6 +295,8 @@ def UpdateInventory():
         # invDough += 100
         updateDough()
 
+    if addSauce.get() == 1:
+        updateSauce()
         # fdExpenses += 20
     if addSauce.get() == 1:
         # invSauce += 100
@@ -289,7 +304,10 @@ def UpdateInventory():
         
         # fdExpenses += 10
     if addCheese.get() == 1:
+<<<<<<< HEAD
     #   invCheese += 100
+=======
+>>>>>>> 19dae27b7f56fcd907bd454ac5fc7894747bdb96
         updateCheese()
     #     fdExpenses += 25
     if addPepperoni.get() == 1:
