@@ -32,10 +32,6 @@ needCheese = 0.0
 needPepperoni = 0.0
 needSales = 0.0
 
-price = 0.0
-# List of line items
-lineItems = list()
-
 # Function
 def fnOpenDatabase():
     global conn
@@ -176,7 +172,7 @@ def getSales():
         cur.execute(sql)
         records = cur.fetchall()
         print("*** DEBUGGING ***\n records for display", records)
-        lblSales.config(text=records)
+        lblSales.config(text="${:9.2f}".format(records[0][0]))
 
         for record in records:
             fdSales = record[0]
@@ -203,7 +199,7 @@ def getExpenses():
         cur.execute(sql)
         records = cur.fetchall()
         print("*** DEBUGGING ***\n records for display", records)
-        lblExpenses.config(text=records)
+        lblExpenses.config(text="${:9.2f}".format(records[0][0]))
 
         for record in records:
             fdExpenses = record[0]
@@ -358,7 +354,7 @@ def updateSales(price):
 
 # Function to add an item to the order
 def fnAddToOrder():
-    global needDough, needSauce, needCheese, needPepperoni, needSales, lineItems
+    global needDough, needSauce, needCheese, needPepperoni, needSales
     try:
         qty = float(entQuantity.get())
         needDough += qty * 6
@@ -367,11 +363,9 @@ def fnAddToOrder():
         if pizzaType.get() == 1:
             needPepperoni += qty * 4
             orderDetail = str(qty) + " Pepperoni Pizza(s)"
-            lineItems.append(orderDetail)
             lstItems.insert(END, orderDetail)
         else:
             orderDetail = str(qty) + " Cheese Pizza(s)"
-            lineItems.append(orderDetail)
             lstItems.insert(END, orderDetail)
         needSales += qty * 15
     except:
