@@ -18,7 +18,8 @@ import pathlib
 
 # Global Variable
 conn = None
-invDough = list()
+
+invDough = 0.0
 invSauce = 0.0
 invCheese = 0.0
 invPepperoni = 0.0
@@ -48,7 +49,6 @@ def getDough():
     try:
         global conn, invDough
         cur = conn.cursor()
-
         # Create a veriable for our query
         sql = "SELECT dough FROM inventory;"
          # Output the query for debugging
@@ -59,8 +59,64 @@ def getDough():
         lblDough.config(text=records)
 
         for record in records:
-            # lstTransactions.insert(END, record[0])
-            invDough.append(record[0])
+            invDough = record[0]
+            print('invDough ', invDough)
+
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+def getCheese():
+    print("Get Cheese")
+    try:
+        global conn, invCheese
+        cur = conn.cursor()
+
+        # Create a veriable for our query
+        sql = "SELECT cheese FROM inventory;"
+         # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        records = cur.fetchall()
+        print("*** DEBUGGING ***\n records for display", records)
+        lblCheese.config(text=records)
+
+        for record in records:
+            invCheese = record[0]
+            print('invCheese ', invCheese)
+
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+def getPepperoni():
+    print("Get Pepperoni")
+    try:
+        global conn, invPepperoni
+        cur = conn.cursor()
+
+        # Create a veriable for our query
+        sql = "SELECT pepperoni FROM inventory;"
+         # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        records = cur.fetchall()
+        print("*** DEBUGGING ***\n records for display", records)
+        lblPepperoni.config(text=records)
+
+        for record in records:
+            invPepperoni = record[0]
+            print('invPepperoni ', invPepperoni)
 
     except sqlite3.OperationalError as soe:
         messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
@@ -72,19 +128,65 @@ def getDough():
         traceback.print_exc()
 
 def updateDough():
-    print("Update Dough")
+    print("-----------------------Update Dough")
     try:
         global conn, invDough
         cur = conn.cursor()
-        
         # Create a veriable for our query
-        sql = "UPDATE inventory SET dough = '"+ str(invDough[0] + 100)+ "' WHERE id = 1;"
-         # Output the query for debugging
+        sql = "UPDATE inventory SET dough = '"+ str(invDough + 100)+ "' WHERE id = 1;"
+        # Output the query for debugging
         print("**** debugging ***\nQuery:", sql)
-        cur.execute(sql)      
+        cur.execute(sql)
+        conn.commit()
+        print("End")
         getDough()
     
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
 
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+def updateCheese():
+    print("-----------------------Update Cheese")
+    try:
+        global conn, invCheese
+        cur = conn.cursor()
+        # Create a veriable for our query
+        sql = "UPDATE inventory SET cheese = '"+ str(invCheese + 100)+ "' WHERE id = 1;"
+        # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        conn.commit()
+        print("End")
+        getCheese()
+    
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+def updatePepperoni():
+    print("-----------------------Update Pepperoni")
+    try:
+        global conn, invPepperoni
+        cur = conn.cursor()
+        # Create a veriable for our query
+        sql = "UPDATE inventory SET pepperoni = '"+ str(invPepperoni + 100)+ "' WHERE id = 1;"
+        # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        conn.commit()
+        print("End")
+        getPepperoni()
+    
     except sqlite3.OperationalError as soe:
         messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
         traceback.print_exc()
@@ -96,6 +198,25 @@ def updateDough():
 
 def getInventory():
     getDough()
+    getCheese()
+    getPepperoni()
+
+# Function for adding dough to inventory
+def UpdateInventory():
+    global invDough, invSauce, invCheese, invPepperoni, fdExpenses
+    if addDough.get() == 1:
+        updateDough()
+
+        # fdExpenses += 20
+    # if addSauce.get() == 1:
+        # invSauce += 100
+        # fdExpenses += 10
+    if addCheese.get() == 1:
+          updateCheese()
+    #     fdExpenses += 25
+    if addPepperoni.get() == 1:
+        updatePepperoni()
+    #     fdExpenses += 40
 
 # GUI
 root = Tk()
@@ -130,8 +251,7 @@ Checkbutton(root, text="Add Dough", variable=addDough).grid(row=1, column=11, st
 Checkbutton(root, text="Add Sauce", variable=addSauce).grid(row=2, column=11, sticky=W)
 Checkbutton(root, text="Add Cheese", variable=addCheese).grid(row=3, column=11, sticky=W)
 Checkbutton(root, text="Add Pepperoni", variable=addPepperoni).grid(row=4, column=11,sticky=W)
-# Button(root, text="Add To Inventory", command=fnAddToInventory).grid(row=5, column=11,sticky=W)
-Button(root, text="Add To Inventory", command=updateDough).grid(row=5, column=11,sticky=W)
+Button(root, text="Add To Inventory", command=UpdateInventory).grid(row=5, column=11,sticky=W)
 
 Label(root, text=" ").grid(row=1, column=19, sticky=W) # Spacer between add to inventory & order form
 Label(root, text="ORDER FORM").grid(row=0, column=20, columnspan=3, sticky=W)
