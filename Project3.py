@@ -32,6 +32,8 @@ needCheese = 0.0
 needPepperoni = 0.0
 needSales = 0.0
 
+maxOrderNumber = 0
+
 # Function
 def fnOpenDatabase():
     global conn
@@ -214,6 +216,96 @@ def getExpenses():
         messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
         traceback.print_exc()
 
+def getAllOrderNumber():
+    lstPastOrderNumber.delete(0, END)
+    print("Get Order Number")
+    try:
+        global conn
+        cur = conn.cursor()
+        # Create a veriable for our query
+        sql = "SELECT DISTINCT orderNumber FROM orders;"
+         # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        records = cur.fetchall()
+        print("*** DEBUGGING ***\n records for display", records)
+        print("---------------------------------Records size---------------------------------",len(records))
+        # sizeRecords = len(records)
+        # if sizeRecords == 0:
+        #     orderNumber = 0
+        #     lstPastOrderNumber.insert(END, str(orderNumber))
+        # else:
+        for record in records:
+            lstPastOrderNumber.insert(END, str(record[0]))
+
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+def getMaxOrderNumber():
+    print("Get Order Number")
+    try:
+        global conn, maxOrderNumber
+        cur = conn.cursor()
+        # Create a veriable for our query
+        sql = "SELECT MAX(orderNumber) FROM orders;"
+         # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        records = cur.fetchall()
+        print("*** DEBUGGING ***\n records for display", records)
+        print("---------------------------------Records size---------------------------------",len(records))
+        sizeRecords = len(records)
+        print("---------------------------------Records size")
+        if sizeRecords == 0 or sizeRecords == None:
+            maxOrderNumber = 0
+            print('``````````````Order Number ', maxOrderNumber)
+        else:
+            for record in records:
+                maxOrderNumber = record[0]
+        print('Order Number ', maxOrderNumber)
+
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+def getOrderDetails(selectOrderNumber):
+    lstPastOrderDetial.delete(0, END)
+    print("Get Order Details")
+    try:
+        global conn
+        cur = conn.cursor()
+        # Create a veriable for our query
+        sql = "SELECT lineItemText FROM orders WHERE orderNumber = "+str(selectOrderNumber)+";"
+         # Output the query for debugging
+        print("**** debugging ***\nQuery:", sql)
+        cur.execute(sql)
+        records = cur.fetchall()
+        print("*** DEBUGGING ***\n records for display", records)
+
+        for record in records:
+            lstPastOrderDetial.insert(END, str(record[0]))
+
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+
 def updateDough(value):
     print("-----------------------Update Dough")
     try:
@@ -352,9 +444,38 @@ def updateSales(price):
         messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
         traceback.print_exc()
 
+
+def insertOrder(orderDetail):
+    print("-----------------------Insert Order Details")
+    try:
+        global conn, maxOrderNumber
+        cur = conn.cursor()
+        # Create a veriable for our query
+        # sql = "INSERT INTO orders (lineItemText) VALUES ('"+str(orderDetail) +"') WHERE orderNumber = "+str(orderNumber)+";"
+        # sql = "INSERT INTO orders (orderNumber, lineItemText) VALUES ('"+str(orderDetail) +"') WHERE orderNumber = "+str(maxOrderNumber)+";"
+        sql = "INSERT INTO orders (orderNumber, lineItemText) VALUES ("+str(maxOrderNumber)+", '" + str(orderDetail) + "');"
+        print("*** DEBUGGING ***\nquery:", sql)
+        cur.execute(sql)
+        conn.commit()
+        print("End of insertOrder..............")
+
+    except ValueError as ve:
+        messagebox.showerror("Error", "Please enter a valid amount value.\n\n" + str(ve))
+        traceback.print_exc()
+
+    except sqlite3.OperationalError as soe:
+        messagebox.showerror("Error", "Database error. Please contact support.\n\n" + str(soe))
+        traceback.print_exc()
+
+    # Catch all the error, should be the last one you use
+    except Exception as ex:
+        messagebox.showerror("Error", "Something went wrong!\n\n" + str(ex))
+        traceback.print_exc()
+
+
 # Function to add an item to the order
 def fnAddToOrder():
-    global needDough, needSauce, needCheese, needPepperoni, needSales
+    global needDough, needSauce, needCheese, needPepperoni, needSales, orderDetail
     try:
         qty = float(entQuantity.get())
         needDough += qty * 6
@@ -383,6 +504,10 @@ def getInventory():
     getSales()
     getExpenses()
     getProfits()
+    
+    getAllOrderNumber()
+    getMaxOrderNumber()
+    # print("Here-------------", maxOrderNumber)
 
 # Function for adding dough to inventory
 def UpdateInventory():
@@ -417,7 +542,7 @@ def UpdateInventory():
 
 # Function to place order
 def fnPlaceOrder():
-    global needDough, needSauce, needCheese, needPepperoni, needSales, invDough, invSauce, invCheese, invPepperoni, fdSales, fdExpenses
+    global needDough, needSauce, needCheese, needPepperoni, needSales, invDough, invSauce, invCheese, invPepperoni, fdSales, fdExpenses, maxOrderNumber
     
     if needDough > invDough or needSauce > invSauce or needCheese > invCheese or needPepperoni > invPepperoni:
         messagebox.showerror("Inventory Error", "There is not enough inventory to place this order. Either cancel the order or add more inventory.")
@@ -442,10 +567,23 @@ def fnPlaceOrder():
         updateSales(needSales)
         needSales = 0.0
 
-        lstItems.delete(0, END) 
-        # fnUpdateInventoryOutput() 
-        # fnUpdateFinancialData()
         getProfits()
+
+        print("++++++++++++++++maxOrderNumber", maxOrderNumber)
+        if maxOrderNumber == None:
+            maxOrderNumber = 1
+        else:
+            maxOrderNumber = maxOrderNumber + 1
+        print("maxOrderNumber", maxOrderNumber)
+        print('before insert order::::::::::::')
+        for i, value in enumerate(lstItems.get(0, END)):
+            print("//////////////////")
+            print(i, ":", value)
+            print("//////////////////")
+            insertOrder(value)
+
+        lstItems.delete(0, END)
+        getAllOrderNumber()
 
 # Function to cancel order
 def fnCancelOrder():
@@ -456,6 +594,14 @@ def fnCancelOrder():
     needPepperoni = 0.0
     needSales = 0.0
     lstItems.delete(0, END)
+
+# Funtcion to show order details
+def fnShowOrderDetails():
+    print("Show Order Details")
+    for i in lstPastOrderNumber.curselection():
+        selectOrderNumber = lstPastOrderNumber.get(i)
+    getOrderDetails(selectOrderNumber)
+
 
 # GUI
 root = Tk()
@@ -539,9 +685,9 @@ frmPastItems = Frame(root)
 frmPastItems.grid(row=22, column=0, columnspan=25, rowspan=5, sticky=W)
 scrPastItems = Scrollbar(frmPastItems)
 scrPastItems.grid(row=0, column=1, sticky=N+S+W)
-lstPastItems = Listbox(frmPastItems, height=5, width=25, yscrollcommand=scrPastItems.set)
-lstPastItems.grid(row=0, column=0)
-scrPastItems.config(command=lstPastItems.yview)
+lstPastOrderNumber = Listbox(frmPastItems, height=5, width=25, yscrollcommand=scrPastItems.set)
+lstPastOrderNumber.grid(row=0, column=0)
+scrPastItems.config(command=lstPastOrderNumber.yview)
 
 # PAST ORDERS DEAILS
 Label(root, text=" ").grid(row=20, column=20) # Row spacer
@@ -550,11 +696,11 @@ frmPastItems = Frame(root)
 frmPastItems.grid(row=22, column=20, columnspan=30, rowspan=5, sticky=W)
 scrPastItems = Scrollbar(frmPastItems)
 scrPastItems.grid(row=0, column=1, sticky=N+S+W)
-lstPastItems = Listbox(frmPastItems, height=5, width=45, yscrollcommand=scrPastItems.set)
-lstPastItems.grid(row=0, column=0)
-scrPastItems.config(command=lstPastItems.yview)
+lstPastOrderDetial = Listbox(frmPastItems, height=5, width=45, yscrollcommand=scrPastItems.set)
+lstPastOrderDetial.grid(row=0, column=0)
+scrPastItems.config(command=lstPastOrderDetial.yview)
 
-Button(root, text="Show Order Details").grid(row=28, column=0, columnspan=3, sticky=W)
+Button(root, text="Show Order Details", command=fnShowOrderDetails).grid(row=28, column=0, columnspan=3, sticky=W)
 
 # Connect and open the database
 fnOpenDatabase()

@@ -13,3 +13,22 @@ SET dough = 100
 WHERE id = 1;
 
 UPDATE finances SET expenses = '"+ str(invPepperoni + 100)+ "' WHERE id = 1;
+
+INSERT INTO orders (lineItemText) VALUES ('1.0 Cheese Pizza(s)') WHERE orderNumber = 1;
+
+SELECT DISTINCT orderNumber, lineItemText FROM orders;
+
+SELECT DISTINCT orderNumber FROM orders;
+
+INSERT INTO orders (orderNumber, lineItemText) VALUES (1, '1.0 Cheese Pizza(s)');
+
+SELECT MAX(orderNumber) FROM orders;
+
+INSERT INTO orders (orderNumber, lineItemText) VALUES (1, '1.0 Cheese Pizza(s)');
+"INSERT INTO orders (orderNumber, lineItemText) VALUES ('"+str(maxOrderNumber),str(orderDetail)+"');"
+
+INSERT INTO orders (orderNumber, lineItemText) VALUES (1, '2.0 Pepperoni Pizza(s)');
+
+INSERT INTO orders (orderNumber, lineItemText) VALUES (2, '3.0 Pepperoni Pizza(s)');
+
+SELECT lineItemText FROM orders WHERE orderNumber = 1;
