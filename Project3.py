@@ -16,6 +16,7 @@ import traceback
 import sqlite3
 import pathlib
 
+
 # Global Variable
 conn = None
 
@@ -31,6 +32,7 @@ needSauce = 0.0
 needCheese = 0.0
 needPepperoni = 0.0
 needSales = 0.0
+
 
 maxOrderNumber = 0
 
@@ -478,17 +480,33 @@ def fnAddToOrder():
     global needDough, needSauce, needCheese, needPepperoni, needSales, orderDetail
     try:
         qty = float(entQuantity.get())
-        needDough += qty * 6
-        needSauce += qty * 7 
-        needCheese += qty * 16 
-        if pizzaType.get() == 1:
-            needPepperoni += qty * 4
-            orderDetail = str(qty) + " Pepperoni Pizza(s)"
-            lstItems.insert(END, orderDetail)
+        if qty <= 0:
+            answer = messagebox.askyesno("Verify Input", "Either 0 or a negative number was entered. Are you sure you want to proceed")
+            print("answer:", answer)
+            if answer == True:
+                needDough += qty * 6
+                needSauce += qty * 7 
+                needCheese += qty * 16 
+                if pizzaType.get() == 1:
+                    needPepperoni += qty * 4
+                    orderDetail = str(qty) + " Pepperoni Pizza(s)"
+                    lstItems.insert(END, orderDetail)
+                else:
+                    orderDetail = str(qty) + " Cheese Pizza(s)"
+                    lstItems.insert(END, orderDetail)
+                needSales += qty * 15
         else:
-            orderDetail = str(qty) + " Cheese Pizza(s)"
-            lstItems.insert(END, orderDetail)
-        needSales += qty * 15
+            needDough += qty * 6
+            needSauce += qty * 7 
+            needCheese += qty * 16 
+            if pizzaType.get() == 1:
+                needPepperoni += qty * 4
+                orderDetail = str(qty) + " Pepperoni Pizza(s)"
+                lstItems.insert(END, orderDetail)
+            else:
+                orderDetail = str(qty) + " Cheese Pizza(s)"
+                lstItems.insert(END, orderDetail)
+                needSales += qty * 15
     except:
         messagebox.showerror("Input Error", "The quantity must be a number.")
 
@@ -542,48 +560,49 @@ def UpdateInventory():
 
 # Function to place order
 def fnPlaceOrder():
-    global needDough, needSauce, needCheese, needPepperoni, needSales, invDough, invSauce, invCheese, invPepperoni, fdSales, fdExpenses, maxOrderNumber
-    
+    global needDough, needSauce, needCheese, needPepperoni, needSales, invDough, invSauce, invCheese, invPepperoni, fdSales, fdExpenses, maxOrderNumber, orderDetail
+
+
     if needDough > invDough or needSauce > invSauce or needCheese > invCheese or needPepperoni > invPepperoni:
-        messagebox.showerror("Inventory Error", "There is not enough inventory to place this order. Either cancel the order or add more inventory.")
+            messagebox.showerror("Inventory Error", "There is not enough inventory to place this order. Either cancel the order or add more inventory.")
     else:
-        # invDough -= needDough
-        updateDough(-needDough)
-        needDough = 0.0
+            # invDough -= needDough
+            updateDough(-needDough)
+            needDough = 0.0
 
-        # invSauce -= needSauce
-        updateSauce(-needSauce)
-        needSauce = 0.0 
+            # invSauce -= needSauce
+            updateSauce(-needSauce)
+            needSauce = 0.0 
 
-        # invCheese -= needCheese
-        updateCheese(-needCheese)
-        needCheese = 0.0 
+            # invCheese -= needCheese
+            updateCheese(-needCheese)
+            needCheese = 0.0 
 
-        # invPepperoni -= needPepperoni
-        updatePepperoni(-needPepperoni)
-        needPepperoni = 0.0
+            # invPepperoni -= needPepperoni
+            updatePepperoni(-needPepperoni)
+            needPepperoni = 0.0
 
-        # fdSales += needSales
-        updateSales(needSales)
-        needSales = 0.0
+            # fdSales += needSales
+            updateSales(needSales)
+            needSales = 0.0
 
-        getProfits()
+            getProfits()
 
-        print("++++++++++++++++maxOrderNumber", maxOrderNumber)
-        if maxOrderNumber == None:
-            maxOrderNumber = 1
-        else:
-            maxOrderNumber = maxOrderNumber + 1
-        print("maxOrderNumber", maxOrderNumber)
-        print('before insert order::::::::::::')
-        for i, value in enumerate(lstItems.get(0, END)):
-            print("//////////////////")
-            print(i, ":", value)
-            print("//////////////////")
-            insertOrder(value)
+            print("++++++++++++++++maxOrderNumber", maxOrderNumber)
+            if maxOrderNumber == None:
+                maxOrderNumber = 1
+            else:
+                maxOrderNumber = maxOrderNumber + 1
+            print("maxOrderNumber", maxOrderNumber)
+            print('before insert order::::::::::::')
+            for i, value in enumerate(lstItems.get(0, END)):
+                print("//////////////////")
+                print(i, ":", value)
+                print("//////////////////")
+                insertOrder(value)
 
-        lstItems.delete(0, END)
-        getAllOrderNumber()
+            lstItems.delete(0, END)
+            getAllOrderNumber()
 
 # Function to cancel order
 def fnCancelOrder():
